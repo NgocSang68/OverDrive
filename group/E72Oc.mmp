@@ -1,0 +1,42 @@
+TARGET          E72Oc.exe
+TARGETTYPE      exe
+UID             0x100039CE 0xE0A1D4C5
+SECUREID        0xE0A1D4C5
+// v8: tra lai capability extended (nguyen nhan crash that KHONG phai capability,
+// xem README muc 5 "v7 -> v8"). Neu v8 khong mo duoc app, doi dong duoi thanh NONE.
+CAPABILITY      PowerMgmt WriteDeviceData ReadDeviceData CommDD
+EPOCSTACKSIZE   0x8000
+EPOCHEAPSIZE    0x20000 0x400000
+
+SOURCEPATH      ..\src
+SOURCE          E72OcApp.cpp
+SOURCE          E72OcDocument.cpp
+SOURCE          E72OcAppUi.cpp
+SOURCE          E72OcContainer.cpp
+SOURCE          E72OcMainView.cpp
+SOURCE          E72OcEngine.cpp
+
+SOURCEPATH      ..\data
+START RESOURCE  E72Oc.rss
+HEADER
+TARGETPATH      resource\apps
+END
+
+START RESOURCE  E72Oc_reg.rss
+TARGETPATH      \private\10003a3f\import\apps
+END
+
+USERINCLUDE     ..\inc
+SYSTEMINCLUDE   \epoc32\include
+
+LIBRARY         euser.lib apparc.lib cone.lib eikcore.lib
+LIBRARY         avkon.lib eikcoctl.lib eikctl.lib
+LIBRARY         fbscli.lib bitgdi.lib gdi.lib
+LIBRARY         efsrv.lib ws32.lib hal.lib
+// v4: bafl.lib chua CDesCArrayFlat (CDesC16ArrayFlat) - thieu -> loi link
+LIBRARY         bafl.lib
+
+ALWAYS_BUILD_AS_ARM
+// Overwritten by E72Oc_build_auto.bat for each compiler pass, same convention as Granny.mmp
+OPTION GCCE     -O2 -marm -mtune=arm1136jf-s -std=gnu++98 -fpermissive -w
+OPTION_REPLACE  ARMCC --arm -O3 -Otime --cpu 6

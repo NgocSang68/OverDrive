@@ -1,0 +1,16 @@
+; Languages
+&EN
+
+; Package header (build bat thay @SDK@ @PLAT@ @VERBUILD@ khi build)
+#{"OverDrive"},(0xE0A1D4C5),2,0,@VERBUILD@,TYPE=SISAPP
+
+; Localised vendor name
+%{"Ngoc Sang"}
+
+; S60 3rd Edition FP2
+[0x101F7961], 0, 0, 0, {"Series60ProductID"}
+
+; Files
+"@SDK@\epoc32\release\@PLAT@\urel\E72Oc.exe" -"!:\sys\bin\E72Oc.exe"
+"@SDK@\epoc32\data\z\resource\apps\E72Oc.rsc" -"!:\resource\apps\E72Oc.rsc"
+"@SDK@\epoc32\data\z\private\10003a3f\import\apps\E72Oc_reg.rsc" -"!:\private\10003a3f\import\apps\E72Oc_reg.rsc"

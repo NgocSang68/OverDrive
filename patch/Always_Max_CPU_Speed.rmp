@@ -1,0 +1,8 @@
+; Always Max CPU Speed (Nokia E72 RM-530 v091.004)
+; Keeps the CPU at the top speed step all the time (the OS no longer lowers it when idle).
+; Target: Z:\sys\bin\dvfs_hal.dll - the function that returns the max performance level requested by the policies now always returns 100%.
+; Side effects: faster battery drain, warmer phone. Disable the patch in RomPatcher+ to go back to normal.
+; If the phone hangs or restarts: remove the battery and start again (the patch lives in shadow memory, so a restart is clean).
+; Made for the OverDrive app: enable this patch first, then apply the clock.
+
+SnR:sys\bin\dvfs_hal.dll:F0412DE974609FE574709FE50180A0E1:6400A0E31EFF2FE10000A0E10000A0E1

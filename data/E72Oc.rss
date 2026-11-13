@@ -1,0 +1,25 @@
+NAME E72P
+
+#include <eikon.rh>
+#include <avkon.rh>
+#include <avkon.rsg>
+#include <appinfo.rh>
+
+RESOURCE RSS_SIGNATURE { }
+
+RESOURCE TBUF r_default_document_name { buf = ""; }
+
+RESOURCE EIK_APP_INFO
+    {
+    cba = R_AVKON_SOFTKEYS_SELECT_BACK;
+    }
+
+RESOURCE LOCALISABLE_APP_INFO r_e72oc_localisable_app_info
+    {
+    short_caption = "OverDrive";
+    caption_and_icon = CAPTION_AND_ICON_INFO
+        {
+        caption = "OverDrive";
+#include "E72Oc_icon.inc"
+        };
+    }
