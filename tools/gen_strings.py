@@ -48,12 +48,12 @@ S('HINT_OK', 'OK: details and options. Dot = default level.', 'OK: xem chi tiế
 S('D44', 'Highest level that passed every stability test. The best choice for everyday use and games.',
          'Mức cao nhất vượt qua mọi bài kiểm tra ổn định. Lựa chọn tốt nhất cho dùng hằng ngày và chơi game.',
          'Level tertinggi yang lulus semua uji stabilitas. Pilihan terbaik untuk pemakaian harian dan game.')
-S('D45', 'Stable. About 0.5% faster than the 785 MHz level, which you will not notice.',
-         'Ổn định. Nhanh hơn mức 785 MHz khoảng 0,5%, gần như không cảm nhận được.',
-         'Stabil. Sekitar 0,5% lebih cepat dari level 785 MHz, hampir tidak terasa.')
-S('D46', 'Acceptable. Screen noise may appear now and then after a while. No real gain over the 785 MHz level.',
-         'Tạm chấp nhận. Thỉnh thoảng có thể nhiễu hình sau một lúc dùng. Không hơn mức 785 MHz là bao.',
-         'Cukup. Layar kadang bisa berbintik setelah beberapa saat. Tidak lebih cepat dari level 785 MHz.')
+S('D45', 'Stable. About 0.5% faster than the 744 MHz level, which you will not notice.',
+         'Ổn định. Nhanh hơn mức 744 MHz khoảng 0,5%, gần như không cảm nhận được.',
+         'Stabil. Sekitar 0,5% lebih cepat dari level 744 MHz, hampir tidak terasa.')
+S('D46', 'Acceptable. Screen noise may appear now and then after a while. No real gain over the 744 MHz level.',
+         'Tạm chấp nhận. Thỉnh thoảng có thể nhiễu hình sau một lúc dùng. Không hơn mức 744 MHz là bao.',
+         'Cukup. Layar kadang bisa berbintik setelah beberapa saat. Tidak lebih cepat dari level 744 MHz.')
 S('D47', 'May cause lag, screen flicker and noise, and the phone may restart by itself. Not recommended.',
          'Có thể bị giật lag, nháy và nhiễu màn hình, máy có thể tự khởi động lại. Không khuyên dùng.',
          'Bisa lag, layar berkedip dan berbintik, ponsel bisa restart sendiri. Tidak disarankan.')
@@ -102,18 +102,18 @@ S('R_PATCH_F', 'If the patch cannot be turned on, restart the phone, enable it, 
 S('R_ONCE', 'To choose another level, exit and reopen the app.',
             'Muốn chọn mức khác, hãy thoát và mở lại app.',
             'Untuk memilih level lain, keluar lalu buka aplikasi lagi.')
-S('R_DROP_T', 'Lowered to 785 MHz', 'Đã hạ về 785 MHz', 'Diturunkan ke 785 MHz')
-S('R_DROP', 'That level was unstable, so it was lowered automatically to 785 MHz.',
-            'Mức đó không ổn định nên đã tự động hạ về 785 MHz.',
-            'Level itu tidak stabil sehingga otomatis diturunkan ke 785 MHz.')
+S('R_DROP_T', 'Lowered to 744 MHz', 'Đã hạ về 744 MHz', 'Diturunkan ke 744 MHz')
+S('R_DROP', 'That level was unstable, so it was lowered automatically to 744 MHz.',
+            'Mức đó không ổn định nên đã tự động hạ về 744 MHz.',
+            'Level itu tidak stabil sehingga otomatis diturunkan ke 744 MHz.')
 S('R_UNST_T', 'Unstable', 'Không ổn định', 'Tidak stabil')
 S('R_UNST', 'The level was unstable, so the overclock was cancelled. Exit the app. If the phone still lags, restart it.',
             'Mức này không ổn định nên đã huỷ ép xung. Hãy thoát app. Nếu máy vẫn giật lag, hãy khởi động lại máy.',
             'Level ini tidak stabil sehingga overclock dibatalkan. Keluar dari aplikasi. Jika ponsel masih lag, restart ponsel.')
 S('R_FAIL_T', 'Not applied', 'Chưa áp dụng được', 'Belum diterapkan')
-S('R_FAIL', 'The clock could not be applied. Try restarting the phone, then open the app and apply again. The app needs the RomPatcher+ driver and a supported phone (tested: Nokia E72). Details are in the log file.',
-            'Chưa áp dụng được xung. Hãy thử khởi động lại máy, rồi mở app và áp dụng lại. App cần driver của RomPatcher+ và máy được hỗ trợ (đã thử: Nokia E72). Chi tiết xem trong file log.',
-            'Kecepatan belum bisa diterapkan. Coba restart ponsel, lalu buka aplikasi dan terapkan lagi. Aplikasi butuh driver RomPatcher+ dan ponsel yang didukung (diuji: Nokia E72). Detail ada di file log.')
+S('R_FAIL', 'The clock could not be applied. Try restarting the phone, then open the app and apply again. The app needs the RomPatcher+ driver and a supported phone (tested: Nokia E5-00). Details are in the log file.',
+            'Chưa áp dụng được xung. Hãy thử khởi động lại máy, rồi mở app và áp dụng lại. App cần driver của RomPatcher+ và máy được hỗ trợ (đã thử: Nokia E5-00). Chi tiết xem trong file log.',
+            'Kecepatan belum bisa diterapkan. Coba restart ponsel, lalu buka aplikasi dan terapkan lagi. Aplikasi butuh driver RomPatcher+ dan ponsel yang didukung (diuji: Nokia E5-00). Detail ada di file log.')
 S('R_LOCKED', 'A clock was already applied in this session. Exit and reopen the app to change it.',
               'Đã áp dụng xung trong lần mở app này. Hãy thoát và mở lại app để đổi.',
               'Kecepatan sudah diterapkan pada sesi ini. Keluar lalu buka aplikasi lagi untuk mengubahnya.')
@@ -126,9 +126,9 @@ S('GT3', 'After applying and after a restart', 'Sau khi áp dụng và khi khở
 S('GT4', 'Problems and fixes', 'Gặp sự cố', 'Masalah dan solusi')
 S('GT5', 'Why is the gain limited?', 'Vì sao chỉ tăng chừng đó?', 'Kenapa kenaikannya terbatas?')
 
-S('GQ0', '1. Open Select clock and pick a level. The default (785 MHz) is the most stable and is the right choice for almost everyone.',
-         '1. Mở Chọn xung nhịp và chọn một mức. Mức mặc định (785 MHz) ổn định nhất và là lựa chọn đúng cho hầu hết mọi người.',
-         '1. Buka Pilih kecepatan CPU dan pilih level. Default (785 MHz) paling stabil dan cocok untuk hampir semua orang.')
+S('GQ0', '1. Open Select clock and pick a level. The default (744 MHz) is the most stable and is the right choice for almost everyone.',
+         '1. Mở Chọn xung nhịp và chọn một mức. Mức mặc định (744 MHz) ổn định nhất và là lựa chọn đúng cho hầu hết mọi người.',
+         '1. Buka Pilih kecepatan CPU dan pilih level. Default (744 MHz) paling stabil dan cocok untuk hampir semua orang.')
 S('GQ1', '2. Press OK, then Apply now. Wait about 1 minute without pressing any key. A progress bar shows how far it is.',
          '2. Bấm OK, rồi chọn Áp dụng ngay. Đợi khoảng 1 phút, không bấm phím nào. Thanh tiến trình cho biết đã chạy được bao nhiêu.',
          '2. Tekan OK, lalu pilih Terapkan sekarang. Tunggu sekitar 1 menit tanpa menekan tombol. Bilah kemajuan menunjukkan prosesnya.')
@@ -139,9 +139,9 @@ S('GQ3', 'You do not need to enable or install any RomPatcher+ patch before usin
          'Bạn KHÔNG cần bật hay cài patch nào trong RomPatcher+ trước khi dùng app. Patch chỉ là tuỳ chọn (xem mục Bật hay tắt patch).',
          'Anda TIDAK perlu mengaktifkan atau memasang patch RomPatcher+ sebelum memakai aplikasi. Patch bersifat opsional (lihat Patch aktif atau mati).')
 
-S('GL0', '785 MHz is the best choice. It is the highest level that passed every stability test, so it is the safest and it is the default.',
-         '785 MHz là lựa chọn tốt nhất. Đây là mức cao nhất vượt qua mọi bài kiểm tra ổn định, nên an toàn nhất và là mức mặc định.',
-         '785 MHz pilihan terbaik. Ini level tertinggi yang lulus semua uji stabilitas, jadi paling aman dan menjadi default.')
+S('GL0', '744 MHz is the best choice. It is the highest level that passed every stability test, so it is the safest and it is the default.',
+         '744 MHz là lựa chọn tốt nhất. Đây là mức cao nhất vượt qua mọi bài kiểm tra ổn định, nên an toàn nhất và là mức mặc định.',
+         '744 MHz pilihan terbaik. Ini level tertinggi yang lulus semua uji stabilitas, jadi paling aman dan menjadi default.')
 S('GL1', '789 MHz is also stable. 794 MHz is acceptable but screen noise may appear after a while.',
          '789 MHz cũng ổn định. 794 MHz tạm chấp nhận, nhưng sau một lúc có thể nhiễu hình.',
          '789 MHz juga stabil. 794 MHz cukup, tetapi layar bisa berbintik setelah beberapa saat.')
@@ -178,28 +178,28 @@ S('GA2', 'The app can apply a clock only once each time it is opened. To choose 
          'Mỗi lần mở app chỉ áp dụng được một lần. Muốn chọn mức khác, hãy thoát và mở lại app.',
          'Aplikasi hanya bisa menerapkan satu kali setiap dibuka. Untuk level lain, keluar lalu buka lagi.')
 
-S('GB0', 'Lag, flicker or screen noise: exit the app, reopen it and apply 785 MHz, or restart the phone.',
-         'Giật lag, nháy hoặc nhiễu màn hình: thoát app, mở lại và áp dụng 785 MHz, hoặc khởi động lại máy.',
-         'Lag, layar berkedip atau berbintik: keluar dari aplikasi, buka lagi dan terapkan 785 MHz, atau restart ponsel.')
-S('GB1', 'Not applied: the app needs the RomPatcher+ driver and a supported phone (tested: Nokia E72). Restart the phone and try again.',
-         'Không áp dụng được: app cần driver của RomPatcher+ và máy được hỗ trợ (đã thử: Nokia E72). Hãy khởi động lại máy và thử lại.',
-         'Tidak bisa diterapkan: aplikasi butuh driver RomPatcher+ dan ponsel yang didukung (diuji: Nokia E72). Restart ponsel dan coba lagi.')
+S('GB0', 'Lag, flicker or screen noise: exit the app, reopen it and apply 744 MHz, or restart the phone.',
+         'Giật lag, nháy hoặc nhiễu màn hình: thoát app, mở lại và áp dụng 744 MHz, hoặc khởi động lại máy.',
+         'Lag, layar berkedip atau berbintik: keluar dari aplikasi, buka lagi dan terapkan 744 MHz, atau restart ponsel.')
+S('GB1', 'Not applied: the app needs the RomPatcher+ driver and a supported phone (tested: Nokia E5-00). Restart the phone and try again.',
+         'Không áp dụng được: app cần driver của RomPatcher+ và máy được hỗ trợ (đã thử: Nokia E5-00). Hãy khởi động lại máy và thử lại.',
+         'Tidak bisa diterapkan: aplikasi butuh driver RomPatcher+ dan ponsel yang didukung (diuji: Nokia E5-00). Restart ponsel dan coba lagi.')
 S('GB2', 'Phone frozen: remove the battery and start it again. It returns to normal.',
          'Máy bị đơ: hãy tháo pin rồi bật lại, máy sẽ trở về bình thường.',
          'Ponsel hang: lepas baterai lalu nyalakan lagi, ponsel kembali normal.')
 
-S('GW0', '785 MHz is already 31% above the stock 597 MHz. The CPU voltage cannot be raised, so above this the chip starts to fail.',
-         '785 MHz đã cao hơn xung gốc 597 MHz tới 31%. Điện áp CPU không tăng được nên vượt mức này chip bắt đầu lỗi.',
-         '785 MHz sudah 31% di atas kecepatan asli 597 MHz. Tegangan CPU tidak bisa dinaikkan, jadi lewat batas ini chip mulai error.')
+S('GW0', '744 MHz is already 31% above the stock 597 MHz. The CPU voltage cannot be raised, so above this the chip starts to fail.',
+         '744 MHz đã cao hơn xung gốc 597 MHz tới 31%. Điện áp CPU không tăng được nên vượt mức này chip bắt đầu lỗi.',
+         '744 MHz sudah 31% di atas kecepatan asli 597 MHz. Tegangan CPU tidak bisa dinaikkan, jadi lewat batas ini chip mulai error.')
 S('GW1', 'Games are also limited by memory speed, which gains only about 13%, so game FPS rises less than the clock.',
          'Game còn bị giới hạn bởi tốc độ RAM, chỉ nhanh hơn khoảng 13%, nên FPS tăng ít hơn mức tăng xung.',
          'Game juga dibatasi kecepatan RAM yang hanya naik sekitar 13%, sehingga FPS naik lebih kecil dari kecepatan CPU.')
 
 # ---- Giới thiệu ----
 S('AB_VER', 'Version 1.1', 'Phiên bản 1.1', 'Versi 1.1')
-S('AB_P1', 'Overclock tool for Symbian S60 3rd Edition FP2. On the Nokia E72 it raises the CPU from the stock 597 MHz up to about 785 MHz (+31%), at the level you choose.',
-           'Công cụ ép xung cho Symbian S60 3rd Edition FP2. Trên Nokia E72, app nâng CPU từ 597 MHz gốc lên khoảng 785 MHz (+31%), theo mức xung bạn chọn.',
-           'Alat overclock untuk Symbian S60 3rd Edition FP2. Pada Nokia E72, aplikasi menaikkan CPU dari 597 MHz asli menjadi sekitar 785 MHz (+31%), sesuai level yang Anda pilih.')
+S('AB_P1', 'Overclock tool for Symbian S60 3rd Edition FP2. On the Nokia E5-00 it raises the CPU from the stock 597 MHz up to about 744 MHz (+25%), at the level you choose.',
+           'Công cụ ép xung cho Symbian S60 3rd Edition FP2. Trên Nokia E5-00, app nâng CPU từ 597 MHz gốc lên khoảng 744 MHz (+25%), theo mức xung bạn chọn.',
+           'Alat overclock untuk Symbian S60 3rd Edition FP2. Pada Nokia E5-00, aplikasi menaikkan CPU dari 597 MHz asli menjadi sekitar 744 MHz (+25%), sesuai level yang Anda pilih.')
 S('AB_P2', 'Based on the idea of SymbianOverclock (github.com/1234bpv/SymbianOverclock), which only supports the Nokia N95. The S60v3 FP2 version in this app was built and tested independently by the author.',
            'Dựa trên ý tưởng của SymbianOverclock (github.com/1234bpv/SymbianOverclock), vốn chỉ dành cho Nokia N95. Phiên bản S60v3 FP2 trong app này do tác giả tự làm và tự thử nghiệm.',
            'Berdasarkan ide SymbianOverclock (github.com/1234bpv/SymbianOverclock) yang hanya mendukung Nokia N95. Versi S60v3 FP2 di aplikasi ini dibuat dan diuji sendiri oleh pembuatnya.')

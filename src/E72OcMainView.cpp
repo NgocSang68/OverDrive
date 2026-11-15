@@ -18,21 +18,21 @@
 
 // ---------- trang thai ben vung (file C:\data\e72oc_ui.txt: "ngon_ngu K_mac_dinh") ----------
 static TInt gLang = 0;          // 0 English, 1 Viet co dau, 2 Indonesia
-static TInt gDefK = 44;         // muc xung mac dinh (44..48)
+static TInt gDefK = 30;         // muc xung mac dinh (K=30 = 744 MHz) - an toan tren E5
 static TInt gFontLvl = 0;       // co chu 0..4 (0 = nho nhat, mac dinh; 2 = co chu cua v43)
 static const TInt KFontPct[5] = { 76, 88, 100, 114, 128 };
 static TBool gApplied = EFalse; // da giu xung trong lan mo app nay (de hien o tieu de)
 static TInt gAppliedK = 0;
 static TInt gAppliedMhz = 0;
 
-static const TInt KMinK = 44;
-static const TInt KMaxUiK = 48;
-static const TInt KLevels = 5;  // K=44..48
+static const TInt KMinK = 30;
+static const TInt KMaxUiK = 30;
+static const TInt KLevels = 1;  // chi 1 muc: K=30 (744 MHz) - an toan tren E5
 
 static void LoadSettings()
     {
     gLang = 0;
-    gDefK = 44;
+    gDefK = 30;
     gFontLvl = 0;
     RFs fs;
     if (fs.Connect() != KErrNone) return;
@@ -44,18 +44,18 @@ static void LoadSettings()
             {
             TLex8 lex(b);
             TInt l = 0;
-            TInt k = 44;
+            TInt k = 30;
             TInt fl = 0;
             lex.SkipSpace();
             if (lex.Val(l) == KErrNone)
                 {
                 lex.SkipSpace();
-                if (lex.Val(k) != KErrNone) k = 44;
+                if (lex.Val(k) != KErrNone) k = 30;
                 lex.SkipSpace();
                 if (lex.Val(fl) != KErrNone) fl = 0;
                 if (fl >= 0 && fl <= 4) gFontLvl = fl;
                 if (l >= 0 && l <= 2) gLang = l;
-                if (k >= KMinK && k <= KMaxUiK) gDefK = k;
+                if (k == KMinK) gDefK = k;
                 }
             }
         f.Close();
@@ -190,12 +190,12 @@ static TRgb ColOf(TInt aIdx)
 
 static TRgb LevelCol(TInt aK)
     {
-    switch (aK)
+    switch (aK - KMinK)
         {
-        case 44: return COL_GREEN;
-        case 45: return COL_LIME;
-        case 46: return COL_AMBER;
-        case 47: return COL_ORANGE;
+        case 0: return COL_GREEN;
+        case 1: return COL_LIME;
+        case 2: return COL_AMBER;
+        case 3: return COL_ORANGE;
         default: return COL_RED;
         }
     }
@@ -203,6 +203,7 @@ static TRgb LevelCol(TInt aK)
 // ---------- so lieu muc xung (PLL0 = 38.4 MHz * (140+K) / 9; goc 597 MHz) ----------
 static TInt MhzOf(TInt aK)
     {
+    if (aK == 30) return 744;  // E5-00: do thuc te
     return (TInt)(((TInt64)38400 * (140 + aK) / 9) / 1000);
     }
 
@@ -340,7 +341,7 @@ static void ProgTick(TAny* aPtr)
 void CE72OcMainView::ConstructL(const TRect& aRect)
     {
     CreateWindowL();
-    E72OcEngine::SetLogEnabled(EFalse);  // v44: nguoi dung thuong khong ghi log
+    E72OcEngine::SetLogEnabled(ETrue);   // v45 (ban chan doan E5): luon ghi log, khong tat
     LoadSettings();
     LoadFonts();
     EnsurePatchFile();
@@ -827,13 +828,12 @@ void CE72OcMainView::DrawClock(CWindowGc& aGc, const TRect& aR) const
         const TInt rd = 10;
         const TRect rg(row.iTl.iX + 11, row.iTl.iY + (rowH - rd) / 2, row.iTl.iX + 11 + rd, row.iTl.iY + (rowH - rd) / 2 + rd);
         Ring(aGc, rg, (k == gDefK) ? COL_ACCENT : COL_DIM, (k == gDefK));
+        // hien 1 muc K=30 (744 MHz)
         iTmpB.Format(_L("%d MHz"), MhzOf(k));
         const TInt tx = rg.iBr.iX + 6;
         PutText(aGc, fn, TRect(tx, row.iTl.iY, row.iBr.iX, row.iBr.iY), iTmpB, COL_TEXT, CGraphicsContext::ELeft, 0);
-        // nhan ngan ben phai (chi khi con cho, khong de len MHz)
-        TPtrC tag = Tr(S_TG44 + (k - 44));
-        if (tx + fn->TextWidthInPixels(iTmpB) + 10 + fs->TextWidthInPixels(tag) + 8 < row.iBr.iX)
-            PutText(aGc, fs, TRect(row.iTl.iX, row.iTl.iY, row.iBr.iX - 7, row.iBr.iY), tag, LevelCol(k), CGraphicsContext::ERight, 0);
+        TPtrC tag = Tr(S_TG44 + (k - KMinK));
+        PutText(aGc, fs, TRect(row.iTl.iX, row.iTl.iY, row.iBr.iX - 7, row.iBr.iY), tag, LevelCol(k), CGraphicsContext::ERight, 0);
         }
 
     // tom tat muc dang chon (ngan, luon vua khung); day du o trang chi tiet
@@ -845,7 +845,7 @@ void CE72OcMainView::DrawClock(CWindowGc& aGc, const TRect& aR) const
     const TInt lhN = fn->HeightInPixels() + 3;
     const TInt lhS = fs->HeightInPixels() + 3;
     TInt y = detail.iTl.iY + 6;
-    y += WrapText(&aGc, fn, Tr(S_T44 + (k - 44)), dx, y, dw, lhN, LevelCol(k), detail);
+    y += WrapText(&aGc, fn, Tr(S_T44 + (k - KMinK)), dx, y, dw, lhN, LevelCol(k), detail);
     y += 1;
     iTmpB.Format(_L("+%d%% "), PctOf(k));
     iTmpB.Append(Tr(S_GAIN));
@@ -1031,12 +1031,12 @@ TInt CE72OcMainView::BuildBlocks(TBlock* aOut, TInt aMax) const
             const TInt k = KMinK + iSelClock;
             iTmpA.Format(_L("%d MHz"), MhzOf(k));
             n = PushB(aOut, n, aMax, 3, iTmpA, (k <= 45) ? 3 : ((k == 46) ? 4 : 5));
-            n = PushB(aOut, n, aMax, 0, Tr(S_T44 + (k - 44)), 2);
+            n = PushB(aOut, n, aMax, 0, Tr(S_T44 + (k - KMinK)), 2);
             iTmpB.Format(_L("+%d%% "), PctOf(k));
             iTmpB.Append(Tr(S_GAIN));
             n = PushB(aOut, n, aMax, 2, iTmpB, 1);
             if (k == gDefK) n = PushB(aOut, n, aMax, 2, Tr(S_DEFAULT), 2);
-            n = PushB(aOut, n, aMax, 1, Tr(S_D44 + (k - 44)), 0);
+            n = PushB(aOut, n, aMax, 1, Tr(S_D44 + (k - KMinK)), 0);
             n = PushB(aOut, n, aMax, 2, Tr(S_C_NOTE), 1);
             n = PushB(aOut, n, aMax, 0, Tr(S_PRE_H), 4);
             n = PushB(aOut, n, aMax, 1, Tr(S_PRE_P), 0);

@@ -1,4 +1,4 @@
-; Always Max CPU Speed (Nokia E72 RM-530 v091.004)
+; Always Max CPU Speed (Nokia E5-00 RM-632 v102.002)
 ; Keeps the CPU at the top speed step all the time (the OS no longer lowers it when idle).
 ; Target: Z:\sys\bin\dvfs_hal.dll - the function that returns the max performance level requested by the policies now always returns 100%.
 ; Side effects: faster battery drain, warmer phone. Disable the patch in RomPatcher+ to go back to normal.
