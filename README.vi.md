@@ -1,7 +1,7 @@
 # OverDrive — ép xung CPU lúc đang chạy cho Symbian S60 3rd Edition FP2
 
 **OverDrive** nâng xung CPU của **Nokia E5-00** (RM-632) ngay lúc máy đang chạy, không sửa firmware.
-Chọn một mức, đợi khoảng một phút, máy chạy 725 MHz thay vì 597 MHz gốc. Khởi động lại máy là
+Chọn một mức, đợi khoảng một phút, máy chạy 744 MHz thay vì 597 MHz gốc. Khởi động lại máy là
 quay về xung gốc.
 
 > English: see [README.md](README.md).
@@ -15,13 +15,13 @@ dự án này đều do tác giả tự tìm và tự test trên máy E5-00 th�
 
 | Hạng mục | Tình trạng |
 |---|---|
-| Lõi ép xung (K=30, 725 MHz) | Đã test trên Nokia E5-00 thật, RM-632, firmware 102.002 |
+| Lõi ép xung (K=30, 744 MHz) | Đã test trên Nokia E5-00 thật, RM-632, firmware 102.002 |
 | Giao diện đơn giản (v44: chọn xung theo MHz, ngôn ngữ + cỡ chữ, hướng dẫn theo mục, thanh tiến trình, giới thiệu) | Đã viết và kiểm tra cú pháp; **cần xác nhận trên máy** |
 | Máy / firmware khác | Không hỗ trợ (địa chỉ khác). Đừng thử. |
 
 ## Tính năng
 
-- **Chọn xung:** chỉ một mức an toàn: K=30 (725 MHz), hiện đúng MHz.
+- **Chọn xung:** chỉ một mức an toàn: K=30 (744 MHz), hiện đúng MHz.
 - **3 ngôn ngữ:** English (mặc định), Tiếng Việt có dấu, Indonesia.
 - **Hai kiểu màn hình:** 320×240 và 240×320.
 - **Hướng dẫn** và phần giới thiệu ngắn ngay trong app.
@@ -37,7 +37,7 @@ chạy chậm hơn nhiều. Hiện tượng này đã xảy ra ở K=32 (734 MHz
 
 | K | Xung | Ý nghĩa |
 |---|---|---|
-| 30 | 725 MHz (+21 %) | Ổn định nhất. **Khuyên dùng, là mặc định.** |
+| 30 | 744 MHz (+21 %) | Ổn định nhất. **Khuyên dùng, là mặc định.** |
 | 32 | 734 MHz | Gây sụp CPU (khoá giả): PLL báo 734 MHz nhưng CPU thực tế chỉ ~165 MHz. |
 
 **Không nên ép cao hơn K=30 trên E5-00.** Rủi ro tăng nhanh hơn nhiều so với lợi ích.
@@ -67,7 +67,7 @@ Khởi động lại máy là mất hiệu lực, chỉ cần áp dụng lại.
 ## Cách hoạt động (ngắn)
 
 - PLL0 của E5-00 chạy ở `38,4 MHz × M / (N+1)` với `N=8`, `M=140` ở mức DVFS cao nhất = 597 MHz. App làm
-  cho hệ điều hành dùng `M = 140 + K`, ví dụ K=30 → `M=170` → 725 MHz.
+  cho hệ điều hành dùng `M = 140 + K`, ví dụ K=30 → `M=170` → 744 MHz.
 - Qua driver của RomPatcher+, app vá hàm `SetPll` của OS trong `power_resources.dll`, để chính OS thực
   hiện quy trình khóa PLL an toàn với hệ số nhân cao hơn.
 - Bản vá nằm trong RAM, còn nguyên sau khi đóng app, mất khi khởi động lại.

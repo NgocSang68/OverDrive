@@ -827,13 +827,12 @@ void CE72OcMainView::DrawClock(CWindowGc& aGc, const TRect& aR) const
         const TInt rd = 10;
         const TRect rg(row.iTl.iX + 11, row.iTl.iY + (rowH - rd) / 2, row.iTl.iX + 11 + rd, row.iTl.iY + (rowH - rd) / 2 + rd);
         Ring(aGc, rg, (k == gDefK) ? COL_ACCENT : COL_DIM, (k == gDefK));
-        iTmpB.Format(_L("%d MHz"), MhzOf(k));
+        // hien 1 muc K=30 (725 MHz)
+        iTmpB.Format(_L("%d MHz"), 744);
         const TInt tx = rg.iBr.iX + 6;
         PutText(aGc, fn, TRect(tx, row.iTl.iY, row.iBr.iX, row.iBr.iY), iTmpB, COL_TEXT, CGraphicsContext::ELeft, 0);
-        // nhan ngan ben phai (chi khi con cho, khong de len MHz)
         TPtrC tag = Tr(S_TG44 + (k - KMinK));
-        if (tx + fn->TextWidthInPixels(iTmpB) + 10 + fs->TextWidthInPixels(tag) + 8 < row.iBr.iX)
-            PutText(aGc, fs, TRect(row.iTl.iX, row.iTl.iY, row.iBr.iX - 7, row.iBr.iY), tag, LevelCol(k), CGraphicsContext::ERight, 0);
+        PutText(aGc, fs, TRect(row.iTl.iX, row.iTl.iY, row.iBr.iX - 7, row.iBr.iY), tag, LevelCol(k), CGraphicsContext::ERight, 0);
         }
 
     // tom tat muc dang chon (ngan, luon vua khung); day du o trang chi tiet

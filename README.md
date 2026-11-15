@@ -1,7 +1,7 @@
 # OverDrive — runtime CPU overclock for Symbian S60 3rd Edition FP2
 
 **OverDrive** raises the CPU clock of the **Nokia E5-00** (RM-632) at runtime, with no firmware
-modification. Pick a level, wait about a minute, and the phone runs at 725 MHz instead of the stock
+modification. Pick a level, wait about a minute, and the phone runs at 744 MHz instead of the stock
 597 MHz. A reboot always returns the phone to its factory clock.
 
 > Tiếng Việt: xem [README.vi.md](README.vi.md).
@@ -16,13 +16,13 @@ real E5-00 (RM-632, firmware 102.002).
 
 | Item | State |
 |---|---|
-| Overclock engine (K=30, 725 MHz) | Tested on a real Nokia E5-00, RM-632, firmware 102.002 |
+| Overclock engine (K=30, 744 MHz) | Tested on a real Nokia E5-00, RM-632, firmware 102.002 |
 | New simple UI (v44: clock list in MHz, language + font size, topic guide with progress bar, about) | Written and syntax-checked; **to be confirmed on a device** |
 | Other devices / firmware | Not supported (different addresses). Do not try. |
 
 ## Features
 
-- **Choose clock:** a single safe level, K=30 (725 MHz), with the real MHz shown.
+- **Choose clock:** a single safe level, K=30 (744 MHz), with the real MHz shown.
 - **3 languages:** English (default), Vietnamese, Indonesian.
 - **Both screen layouts:** 320×240 and 240×320.
 - **Built-in guide** and a short about page.
@@ -38,7 +38,7 @@ but the VCO actually runs much slower. This happens already at K=32 (734 MHz), s
 
 | K | Clock | Meaning |
 |---|---|---|
-| 30 | 725 MHz (+21 %) | Most stable. **Recommended and default.** |
+| 30 | 744 MHz (+21 %) | Most stable. **Recommended and default.** |
 | 32 | 734 MHz | Causes CPU collapse (fake lock): PLL reports 734 MHz but the CPU runs ~165 MHz. |
 
 **Going beyond K=30 is not recommended on the E5-00.** The risk grows much faster than the gain.
@@ -68,7 +68,7 @@ After a restart everything is back to factory speed; just apply again.
 ## How it works (short)
 
 - PLL0 of the E5-00 runs at `38.4 MHz × M / (N+1)` with `N=8`, `M=140` at the top DVFS level = 597 MHz.
-  The app makes the OS use `M = 140 + K` instead, so K=30 gives `M=170` → 725 MHz.
+  The app makes the OS use `M = 140 + K` instead, so K=30 gives `M=170` → 744 MHz.
 - Through the RomPatcher+ driver the app patches the OS function `SetPll` in `power_resources.dll`,
   so the OS itself performs the safe PLL relock sequence with the higher multiplier.
 - The patch lives in RAM and survives closing the app, not a reboot.
