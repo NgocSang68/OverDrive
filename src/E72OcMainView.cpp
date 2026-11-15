@@ -18,7 +18,7 @@
 
 // ---------- trang thai ben vung (file C:\data\e72oc_ui.txt: "ngon_ngu K_mac_dinh") ----------
 static TInt gLang = 0;          // 0 English, 1 Viet co dau, 2 Indonesia
-static TInt gDefK = 30;         // muc xung mac dinh (K=30 = 733 MHz) - an toan tren E5
+static TInt gDefK = 30;         // muc xung mac dinh (K=30 = 744 MHz) - an toan tren E5
 static TInt gFontLvl = 0;       // co chu 0..4 (0 = nho nhat, mac dinh; 2 = co chu cua v43)
 static const TInt KFontPct[5] = { 76, 88, 100, 114, 128 };
 static TBool gApplied = EFalse; // da giu xung trong lan mo app nay (de hien o tieu de)
@@ -27,7 +27,7 @@ static TInt gAppliedMhz = 0;
 
 static const TInt KMinK = 30;
 static const TInt KMaxUiK = 30;
-static const TInt KLevels = 1;  // chi 1 muc: K=30 (733 MHz) - an toan tren E5
+static const TInt KLevels = 1;  // chi 1 muc: K=30 (744 MHz) - an toan tren E5
 
 static void LoadSettings()
     {
@@ -827,7 +827,7 @@ void CE72OcMainView::DrawClock(CWindowGc& aGc, const TRect& aR) const
         const TInt rd = 10;
         const TRect rg(row.iTl.iX + 11, row.iTl.iY + (rowH - rd) / 2, row.iTl.iX + 11 + rd, row.iTl.iY + (rowH - rd) / 2 + rd);
         Ring(aGc, rg, (k == gDefK) ? COL_ACCENT : COL_DIM, (k == gDefK));
-        // hien 1 muc K=30 (725 MHz)
+        // hien 1 muc K=30 (744 MHz)
         iTmpB.Format(_L("%d MHz"), 744);
         const TInt tx = rg.iBr.iX + 6;
         PutText(aGc, fn, TRect(tx, row.iTl.iY, row.iBr.iX, row.iBr.iY), iTmpB, COL_TEXT, CGraphicsContext::ELeft, 0);
