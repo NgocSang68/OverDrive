@@ -1,17 +1,19 @@
+; OverDrive for Nokia E5-00 (RM-632) - package description
+; Build: run makesis from this sis folder (relative paths below).
 ; Languages
 &EN
 
-; Package header (build bat thay C:\S60\devices\S60_3rd_FP2_SDK_v1.1_2 gcce 14 khi build)
-#{"OverDrive"},(0xE0A1D4C5),2,0,14,TYPE=SISAPP
+; Package header
+#{"OverDrive"},(0xE0A1D4C5),2,0,24,TYPE=SISAPP
 
 ; Localised vendor name
 %{"Ngoc Sang"}
+:"Ngoc Sang"
 
 ; S60 3rd Edition FP2
 [0x101F7961], 0, 0, 0, {"Series60ProductID"}
 
 ; Files
-"C:\S60\devices\S60_3rd_FP2_SDK_v1.1_2\epoc32\release\gcce\urel\E72Oc.exe" -"!:\sys\bin\E72Oc.exe"
-"C:\S60\devices\S60_3rd_FP2_SDK_v1.1_2\epoc32\data\z\resource\apps\E72Oc.rsc" -"!:\resource\apps\E72Oc.rsc"
-"C:\S60\devices\S60_3rd_FP2_SDK_v1.1_2\epoc32\data\z\private\10003a3f\import\apps\E72Oc_reg.rsc" -"!:\private\10003a3f\import\apps\E72Oc_reg.rsc"
-"C:\S60\devices\S60_3rd_FP2_SDK_v1.1_2\epoc32\data\z\resource\apps\E72Oc_aif.mif" -"!:\resource\apps\E72Oc_aif.mif"
+"E72Oc.exe"      -"!:\sys\bin\E72Oc.exe"
+"E72Oc.rsc"      -"!:\resource\apps\E72Oc.rsc"
+"E72Oc_reg.rsc"  -"!:\private\10003a3f\import\apps\E72Oc_reg.rsc"

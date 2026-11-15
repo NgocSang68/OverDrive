@@ -28,7 +28,7 @@ _LIT(KDvfsName,    "dvfs_interface");
 namespace {
 const TInt KExpMax = 40;          // so id thu nghiem toi da (ky tu trong e72oc_exp_state.txt)
 TInt gExpId = 0;                  // >0 = Phase2ReadRegsL se chay thu nghiem nay thay cho Stage3Auto
-TBool gLogOn = EFalse;           // v44: mac dinh KHONG ghi log (chi bat khi vao Danh cho nha phat trien)
+TBool gLogOn = ETrue;            // v45 (ban chan doan E5): LUON ghi log de biet ly do that bai
 TBuf<64> gExpLogPath;             // khac rong = LogRaw ghi them ban sao vao file log rieng cua thu nghiem
 // Giu man hinh sang: User::ResetInactivityTime toi da 1 lan / 1.5 s (goi tu cac vong do dai).
 void (*gProgressCb)(TAny*) = NULL;   // v44: giao dien dang ky ham ve thanh tien trinh khi ap dung xung
@@ -254,10 +254,12 @@ namespace {
 struct TRomRange { const char* iName; TUint32 iAddr; TUint32 iSize; };
 const TRomRange KRomRanges[] =
     {
-    { "dvfs_interface", 0x8011dd68u, 0x08bcu },
-    { "dvfs_hal",       0x8011a218u, 0x0ec4u },
-    { "dvfs_engine",    0x8011b168u, 0x2b68u },
-    { "power_resources",0x800ab878u, 0x40dcu }
+    // Nokia E5-00 RM-632 v102.002: code base/size doc tu header E32 trong core.fpsx
+    // (XIP file 0xE41000 <-> VA 0x80000000). Day la cac dia chi THAT cua ban ROM nay.
+    { "dvfs_interface", 0x8011d658u, 0x08bcu },
+    { "dvfs_hal",       0x80119b08u, 0x0ec4u },
+    { "dvfs_engine",    0x8011aa58u, 0x2b68u },
+    { "power_resources",0x800aa878u, 0x40dcu }
     };
 const TInt KRomRangeCount = 4;
 const TUint32 KChunk = 256u;
@@ -379,14 +381,14 @@ void E72OcEngine::MeasureDvfsL(TE72OcResult& /*aOut*/)
 // thanh "cmp r1,#0; ldrne r0,[r1]; moveq r0,#0; bx lr", goi DoControl(1,addr) tu
 // user mode -> kernel doc *addr va tra ve, roi KHOI PHUC code goc + FreeShadow.
 //
-// Tren E72 (da doi chieu LIVE ROM, khop 100% dump): DoControl o 0x8011e158 voi
-// func==1 chi goi DUY NHAT 1 ham 0x8011e138 (8 tu, nguoi goi duy nhat 0x8011e16c)
-// voi r0=this, r1=a1 (nguoi dung). Vá 4 tu dau cua ham do.
+// Tren Nokia E5-00 RM-632 v102.002 (da doi chieu LIVE ROM, khop 100% dump):
+// DoControl o 0x8011da48 voi func==1 chi goi DUY NHAT 1 ham 0x8011da28 (8 tu,
+// nguoi goi duy nhat 0x8011da5c) voi r0=this, r1=a1 (nguoi dung). Vá 4 tu dau cua ham do.
 // AN TOAN: (1) chi doc dia chi trong danh sach trang (cac thanh ghi chinh
 // power_resources.dll cua ROM nay tu doc); (2) kiem tra 8 tu ROM == goc truoc khi
 // va, va sau khi khoi phuc; (3) moi buoc LogRaw+Flush truoc khi lam.
 namespace {
-const TUint32 KBody = 0x8011e138u;
+const TUint32 KBody = 0x8011da28u;
 const TUint32 KBodyOrig[8] =
     { 0xe92d4010u, 0xe1a04000u, 0xeb0000f9u, 0xe3a0100au,
       0xeb0000e1u, 0xe594106cu, 0xe8bd4010u, 0xea0000e2u };
@@ -429,6 +431,48 @@ TInt RomBodyEquals(const TUint32* aExpect, TInt aN)
         }
     return 1;
     }
+
+// v45 (chan doan E5): in thang vai dia chi ROM quan trong de biet ban do XIP tren may that
+// co giong ban da phan tich tu core.fpsx khong (neu khong, moi dia chi duoi day deu sai).
+void LogRomProbe()
+    {
+    TBuf8<192> b;
+    TInt uid = 0;
+    HAL::Get(HALData::EMachineUid, uid);
+    b.Format(_L8("PROBE: machine uid = 0x%08x\r\n"), (TUint32)uid);
+    E72OcEngine::LogRaw(b);
+
+    const TUint32 addrs[4] =
+        { KBody, 0x800acee8u, 0x800acee8u - 0x18u, 0x800acee8u - 0x24u };
+    for (TInt i = 0; i < 4; ++i)
+        {
+        TBool isRom = EFalse;
+        const TInt e = User::IsRomAddress(isRom, (TAny*)addrs[i]);
+        if (e != KErrNone || !isRom)
+            {
+            b.Format(_L8("PROBE: 0x%08x KHONG phai ROM (err=%d) - BAN DO XIP SAI?\r\n"),
+                     addrs[i], e);
+            E72OcEngine::LogRaw(b);
+            continue;
+            }
+        const volatile TUint32* p = (const volatile TUint32*)addrs[i];
+        b.Format(_L8("PROBE: 0x%08x = %08x %08x %08x %08x\r\n"),
+                 addrs[i], p[0], p[1], p[2], p[3]);
+        E72OcEngine::LogRaw(b);
+        }
+    }
+
+// v45: moi lan Ap dung thi xoa log cu, de file chi con lan chay hien tai (de gui lai).
+void ResetLogFile()
+    {
+    if (!gLogOn) return;
+    RFs fs;
+    if (fs.Connect() != KErrNone) return;
+    fs.Delete(_L("C:\\data\\e72oc_log.txt"));
+    if (gExpLogPath.Length() > 0)
+        fs.Delete(gExpLogPath);
+    fs.Close();
+    }
 }
 
 // --- v12 helpers -----------------------------------------------------------
@@ -454,7 +498,10 @@ const TInt KMaxK = 56; // v25: nang tran tu 40 len 56 (M=196, ~+40%); M=204/206 
 // (khong reboot, "XAC NHAN da ve dung M goc" xuat hien) thi moi mo rong lai danh
 // sach nay len { 2, 4, 8, 12, 16, 20, 24 } nhu v14.
 // v20: QUET MANH TAY - leo dan tung buoc, dung o muc dau tien khong on dinh.
-const TInt KAutoLevels[] = { 2, 4, 6, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56 };
+// v46 (E5): quet MIN (buoc 2) tu 2 den 44 de tim dung moc CPU "sup" tren E5-00 - log K=44
+// cho thay PLL bao M=184/locked=1 nhung do that chi ~167 MHz (cung kieu sup cua E72 o K>=47,
+// nhung tren E5 xay ra som hon nhieu). Khong doan moc, do that roi moi chon muc giu.
+const TInt KAutoLevels[] = { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44 };
 const TInt KAutoLevelCount = sizeof(KAutoLevels) / sizeof(KAutoLevels[0]);
 
 TInt RomEquals(TUint32 aAddr, const TUint32* aExpect, TInt aN)
@@ -951,6 +998,25 @@ void ClockSnapshot(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv, const TDes
     E72OcEngine::LogRaw(b);
     }
 
+// v46: CHUP CAC CONG/MUX DONG HO ma ham doi xung cua OS (0x800ACFC4) ghi. Muc dich: khi CPU
+// "sup" (do that thap hon nhieu so voi M trong PLL) thi xem nguon xung/mux co bi doi khong.
+// 0xC60331F0 = [lock base + 0x1F0] - bit3 la bit khoa PLL ma OS poll.
+void ClkGates(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv, const TDesC8& aTag)
+    {
+    const TUint32 g94 = ReadOnce(aPc, aDv, 0xC6033094u);
+    const TUint32 g98 = ReadOnce(aPc, aDv, 0xC6033098u);
+    const TUint32 ga4 = ReadOnce(aPc, aDv, 0xC60330A4u);
+    const TUint32 gb4 = ReadOnce(aPc, aDv, 0xC60330B4u);
+    const TUint32 gb8 = ReadOnce(aPc, aDv, 0xC60330B8u);
+    const TUint32 g04 = ReadOnce(aPc, aDv, 0xC6033104u);
+    const TUint32 g08 = ReadOnce(aPc, aDv, 0xC6033108u);
+    const TUint32 lk  = ReadOnce(aPc, aDv, 0xC60331F0u);
+    TBuf8<300> b;
+    b.Format(_L8("GATE[%S]: 3094=0x%x 3098=0x%x 30a4=0x%x 30b4=0x%x 30b8=0x%x 3104=0x%x 3108=0x%x 31f0=0x%x lock=%d\r\n"),
+             &aTag, g94, g98, ga4, gb4, gb8, g04, g08, lk, (TInt)((lk & 8u) ? 1 : 0));
+    E72OcEngine::LogRaw(b);
+    }
+
 TInt gSampleSecs = 0;    // v28: >0 = che do GHI NEN (khong doi xung, chi lay mau PLL)
 
 // v28: bai do giong game: copy 1 khung 320x240x16bpp (khung/giay) va tron diem anh bang phan mem (khung/giay)
@@ -1437,26 +1503,34 @@ void SampleLoop(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv, TInt aSecs)
     gSummary.Format(_L("Ghi nen: %d%% o muc tren cung (%S), %d%% nguon 192MHz, %d lan doi muc"), pct, &vd16, pct3, changes);
     }
 
-// Va SetPll cua OS (power_resources @0x800ae160..16c, doi chieu disassemble):
+// Va SetPll cua OS (Nokia E5-00 power_resources @0x800acee8..f4, doi chieu disassemble):
 //   goc:  lsl r1,r7,#21 ; lsr r1,r1,#21 ; ldr r6,[pc..] ; add r0,r0,r1,lsl #5
 //   va:   cmp r7,#140   ; addeq r7,r7,#K ; ldr r6,[pc..] ; add r0,r0,r7,lsl #5
 // => khi OS tu dat PLL o muc tren cung (M=140) no dung M+K qua trinh tu an toan cua no,
 // cac muc thap (vd M=26) khong bi dong. r1 duoc ghi de ngay sau (bic r1,r0,#0x10000).
-// v21->v22: dia chi 0x800ae160 trong README/v21 SAI (suy tu offset file dump sai 0x200: tren may
-// that 4 tu o do KHAC ban goc -> v21 HUY ca 3 lan, an toan nhung khong lam gi). v22 TU TIM
-// chu ky 4 tu (kem 2 lenh dung truoc: mov r6,r1 va mov r7,r2) trong vung ROM cua power_resources
-// (file dump bat dau tai 0x800ab878-0x78, xem dvfs_interface: body 0x8011e138 = offset 0x448).
+// Dia chi 0x800ae160 trong README/v21 la cua E72 va SAI tren may that (suy tu offset file
+// dump sai 0x200). Ban E5 nay TU TIM chu ky 4 tu (kem 2 lenh dung truoc: mov r6,r1 va
+// mov r7,r2) trong vung ROM cua power_resources. Chu ky 4 tu va 2 lenh truoc GIONG HET
+// ban E72, chi khac vung quet (code base 0x800aa878, text 0x40dc).
 const TUint32 KSetPllOrig[4] = { 0xe1a01a87u, 0xe1a01aa1u, 0xe59f6b6cu, 0xe0800281u };
 const TInt KBaseM = 140;
 TUint32 gSetPllAddr = 0;
 
 TUint32 FindSetPll(TBool& aPatched)
     {
-    const TUint32 lo = 0x800ab800u;
-    const TUint32 hi = 0x800af900u;
+    const TUint32 lo = 0x800aa878u;   // E5-00 power_resources.dll code base (RM-632 v102.002)
+    const TUint32 hi = 0x800ae954u;   // + text size 0x40dc
     TBool r1 = EFalse, r2 = EFalse;
-    if (User::IsRomAddress(r1, (TAny*)lo) != KErrNone || !r1) return 0;
-    if (User::IsRomAddress(r2, (TAny*)(hi - 4)) != KErrNone || !r2) return 0;
+    if (User::IsRomAddress(r1, (TAny*)lo) != KErrNone || !r1)
+        {
+        E72OcEngine::LogRaw(_L8("S3: FindSetPll - lo 0x800aa878 khong phai ROM\r\n"));
+        return 0;
+        }
+    if (User::IsRomAddress(r2, (TAny*)(hi - 4)) != KErrNone || !r2)
+        {
+        E72OcEngine::LogRaw(_L8("S3: FindSetPll - hi 0x800ae954 khong phai ROM\r\n"));
+        return 0;
+        }
     TUint32 found = 0;
     TInt count = 0;
     for (TUint32 a = lo + 0x24u; a + 16u <= hi; a += 4u)
@@ -1473,6 +1547,12 @@ TUint32 FindSetPll(TBool& aPatched)
             aPatched = pat;
             ++count;
             }
+        }
+    if (count != 1)
+        {
+        TBuf8<128> f;
+        f.Format(_L8("S3: FindSetPll - thay %d chu ky trong 0x%08x..0x%08x\r\n"), count, lo, hi);
+        E72OcEngine::LogRaw(f);
         }
     return (count == 1) ? found : 0;
     }
@@ -1581,6 +1661,8 @@ TBool Stage3Auto(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv)
     TUint32 reg0 = ReadOnce(aPc, aDv, KPllReg);
     TInt n0 = (TInt)(reg0 & 0x1f);
     TInt m0 = (TInt)((reg0 >> 5) & 0x7ff);
+    b.Format(_L8("S3: PLL luc bat dau = 0x%04x (N=%d M=%d)\r\n"), reg0, n0, m0);
+    E72OcEngine::LogRaw(b);
     for (TInt t = 0; t < 8 && !(n0 == 8 && m0 >= KBaseM); ++t)
         {
         for (TInt i = 0; i < 10; ++i) MeasureMhz(3000000u);
@@ -1615,8 +1697,22 @@ TBool Stage3Auto(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv)
             }
         if (!(n0 == 8 && m0 == KBaseM))
             {
-            E72OcEngine::LogRaw(_L8("S3: HUY - OS chua ha ve M goc, de nguyen (thoat app mo lai hoac khoi dong lai)\r\n"));
-            return EFalse;
+            E72OcEngine::LogRaw(_L8("S3: OS chua ha ve M goc trong 12 lan - thu PHUC HOI truc tiep (RecoverTop)\r\n"));
+            if (!RecoverTop(aPc, aDv, KBaseM))
+                {
+                E72OcEngine::LogRaw(_L8("S3: HUY - khong ha duoc ve M goc (khoi dong lai may roi chay lai)\r\n"));
+                return EFalse;
+                }
+            reg0 = ReadOnce(aPc, aDv, KPllReg);
+            n0 = (TInt)(reg0 & 0x1f);
+            m0 = (TInt)((reg0 >> 5) & 0x7ff);
+            b.Format(_L8("S3: RecoverTop xong: PLL=0x%04x N=%d M=%d\r\n"), reg0, n0, m0);
+            E72OcEngine::LogRaw(b);
+            if (!(n0 == 8 && m0 == KBaseM))
+                {
+                E72OcEngine::LogRaw(_L8("S3: HUY - van chua ve M goc (khoi dong lai may roi chay lai)\r\n"));
+                return EFalse;
+                }
             }
         }
 
@@ -1661,12 +1757,15 @@ TBool Stage3Auto(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv)
     E72OcEngine::LogRaw(b);
     b.Format(_L8("S3: BAI DO GIONG GAME o xung goc: blit 320x240 = %d khung/s, tron diem anh = %d khung/s\r\n"), baseBlit, basePix);
     E72OcEngine::LogRaw(b);
+    // v46: chup cay xung + cong dong ho o XUNG GOC de so sanh voi luc sup
+    ClockSnapshot(aPc, aDv, _L8("goc"));
+    ClkGates(aPc, aDv, _L8("goc"));
     // v26: XUNG CO DINH - doc e72oc_fixed.txt; neu co thi bo qua quet, giu dung K do
     const TInt fixedReq = FixedKRead();
     TInt fixedK = fixedReq;
     if (fixedK >= 0)
         {
-        const TInt KFixedHardCap = 44; // K cao nhat da do ON DINH tren may that (log v25: 802..809 MHz)
+        const TInt KFixedHardCap = 30; // E5-00: K=32 gay 'sup' (CPU collapse) — gioi han an toan o K=30
         TInt cap = KFixedHardCap;
         if (lim - 1 < cap) cap = lim - 1;
         if (cap < 0) cap = 0;
@@ -1765,6 +1864,15 @@ TBool Stage3Auto(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv)
         if (bestSeen * 100 < expect * 92)
             {
             E72OcEngine::LogRaw(_L8("S3: toc do that < 92% ky vong sau 3 lan do lai - DUNG QUET (khong ghi tran)\r\n"));
+            // v46: chup trang thai luc sup (de biet nguon/mux/cong dong ho co doi khong), roi go
+            // patch + dua PLL ve goc NGAY (khong de CPU o muc sup trong khi van con chay tiep).
+            ClockSnapshot(aPc, aDv, _L8("sup"));
+            ClkGates(aPc, aDv, _L8("sup"));
+            SetPllWrite(aPc, 0, ETrue);
+            RecoverTop(aPc, aDv, m0);
+            curM = ReadM(aPc, aDv);
+            b.Format(_L8("S3: DA GO PATCH + dua PLL ve M goc (M doc lai=%d)\r\n"), curM);
+            E72OcEngine::LogRaw(b);
             break;
             }
         mn = bestSeen;
@@ -1900,6 +2008,32 @@ TBool Stage3Auto(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv)
             FinalizeToBase(aPc, aDv, n0, m0);
             curM = ReadM(aPc, aDv);
             }
+
+    // v46: KIEM TRA SAU KHI GIU - KHONG tin locked=1 / PLL readback nua. Do toc do THAT; neu
+    // thap hon 90% ky vong (log E5: K=44 bao M=184/locked=1 nhung do duoc ~167 MHz) thi coi nhu
+    // THAT BAI: go patch, dua PLL ve goc, khong bao thanh cong (gResState se = 0).
+    TInt heldMhz = 0;
+    if (holding && holdK > 0)
+        {
+        BusyMs(120);
+        const TInt expectHold = (baseMhz * (m0 + holdK)) / m0;
+        const TInt thrHold = (expectHold * 90 + 99) / 100;
+        heldMhz = BestLoopMhz(4, thrHold);
+        b.Format(_L8("S3: KIEM TRA SAU KHI GIU: do duoc %d MHz, ky vong ~%d MHz (can >= %d)\r\n"),
+                 heldMhz, expectHold, thrHold);
+        E72OcEngine::LogRaw(b);
+        ClockSnapshot(aPc, aDv, _L8("sau khi giu"));
+        ClkGates(aPc, aDv, _L8("sau khi giu"));
+        if (heldMhz < thrHold)
+            {
+            E72OcEngine::LogRaw(_L8("S3: KHONG DAT - CPU sup du PLL bao dung M (bo qua locked=1). Go patch, dua PLL ve goc, khong bao thanh cong\r\n"));
+            SetPllWrite(aPc, 0, ETrue);
+            RecoverTop(aPc, aDv, m0);
+            curM = ReadM(aPc, aDv);
+            holding = EFalse;
+            StateWrite(lim, 0);
+            }
+        }
         }
     else
         {
@@ -1995,12 +2129,15 @@ TBool Stage3Auto(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv)
         }
 
     TUint32 regBack = ReadOnce(aPc, aDv, KPllReg);
-    LogPll(holding ? _L8("DANG GIU XUNG") : _L8("SAU HA VE GOC"), regBack, ReadOnce(aPc, aDv, KPllCtl), MeasureMhz(6000000u));
+    // v46: bao cao bang SO DO THAT, KHONG lay tu thanh ghi PLL (log E5: PLL bao M=184 ~785 MHz
+    // nhung do that chi ~167 MHz). Dung finalMhz cho LogPll + giao dien + gResMhz.
+    const TInt finalMhz = holding ? BestLoopMhz(2, 0) : MeasureMhz(6000000u);
+    LogPll(holding ? _L8("DANG GIU XUNG") : _L8("SAU HA VE GOC"), regBack, ReadOnce(aPc, aDv, KPllCtl), finalMhz);
 
     {
     TInt memNow = MeasureMemMBs();
     b.Format(_L8("S3: RAM bay gio: %d MB/s (goc %d MB/s) - CPU tang %d%% nhung RAM tang %d%%\r\n"),
-             memNow, baseMem, baseMhz > 0 ? (MeasureMhz(6000000u) * 100 / baseMhz - 100) : 0,
+             memNow, baseMem, baseMhz > 0 ? (finalMhz * 100 / baseMhz - 100) : 0,
              baseMem > 0 ? (memNow * 100 / baseMem - 100) : 0);
     E72OcEngine::LogRaw(b);
     TInt nowBlit = 0, nowPix = 0;
@@ -2010,19 +2147,19 @@ TBool Stage3Auto(RPatcherProbeChannel& aPc, RDvfsProbeChannel& aDv)
     b.Format(_L8("S3: BAI DO GIONG GAME bay gio: blit %d khung/s (%d%%), tron diem anh %d khung/s (%d%%) so voi xung goc\r\n"),
              nowBlit, blitPct, nowPix, pixPct);
     E72OcEngine::LogRaw(b);
-    gSummary.Format(_L("K=%d ~%d MHz (PLL that) | RAM %d%% blit %d%% pixel %d%%"),
-                    holding ? holdK : 0, PllKHz(ReadOnce(aPc, aDv, KPllReg)) / 1000,
+    gSummary.Format(_L("K=%d ~%d MHz (do that) | RAM %d%% blit %d%% pixel %d%%"),
+                    holding ? holdK : 0, finalMhz,
                     baseMem > 0 ? (memNow * 100 / baseMem - 100) : 0, blitPct, pixPct);
     if (gKSup)
         {
         if (holding)
-            gSummary.Format(_L("K=%d SUP (CPU tut) -> DA HA VE K=44 (~%d MHz)"), gKSupK, PllKHz(ReadOnce(aPc, aDv, KPllReg)) / 1000);
+            gSummary.Format(_L("K=%d SUP (CPU tut) -> DA HA VE K=44 (~%d MHz)"), gKSupK, finalMhz);
         else
             gSummary.Format(_L("K=%d SUP (CPU tut): da go patch - THOAT APP, lag thi chon CUU HO"), gKSupK);
         }
     // v43: ket qua co cau truc (giao dien moi doc qua E72OcEngine::GetApplyResult)
     gResK = holding ? holdK : 0;
-    gResMhz = PllKHz(ReadOnce(aPc, aDv, KPllReg)) / 1000;
+    gResMhz = finalMhz;
     gResState = holding ? 1 : 0;
     if (gKSup)
         {
@@ -3277,18 +3414,29 @@ void E72OcEngine::Phase2ReadRegsL(TE72OcResult& /*aOut*/)
     {
     TBuf8<200> b;
     TBool keepOpen = EFalse;
+    ResetLogFile();
     LogRaw(_L8("P2: bat dau v43 (giao dien moi OverDrive; DO GIU XUNG chay luong rieng, dong ho trong app; BOOST giu CPU o muc tren cung)\r\n"));
+    LogRomProbe();
 
     TInt uid = 0;
     HAL::Get(HALData::EMachineUid, uid);
+    // v45: KHONG chan theo machine uid nua. UID 0x20014DD0 la cua E72/RM-530; E5-00 RM-632
+    // gan chac chan co UID khac, va chinh phep thu nay tung lam app dung ngay tu dau tren E5
+    // (man hinh that bai chi hien patcher=0 dvfs=0 vi chua kip mo driver). Do an toan that su
+    // nam o 2 buoc sau: 8 tu ROM phai khop ban goc VA chu ky SetPll phai tim thay duy nhat.
     if ((TUint32)uid != 0x20014DD0u)
         {
-        LogRaw(_L8("P2: HUY - machine uid khong phai 0x20014DD0\r\n"));
-        return;
+        b.Format(_L8("P2: machine uid 0x%08x KHAC E72 (0x20014dd0) - chap nhan, dua vao ROM body + SetPll\r\n"),
+                 (TUint32)uid);
+        LogRaw(b);
+        }
+    else
+        {
+        LogRaw(_L8("P2: machine uid dung 0x20014dd0 (E72)\r\n"));
         }
     if (!RomBodyEquals(KBodyOrig, 8))
         {
-        LogRaw(_L8("P2: HUY - 8 tu o 0x8011e138 KHAC ban goc (khong va)\r\n"));
+        LogRaw(_L8("P2: HUY - 8 tu o 0x8011da28 KHAC ban goc (khong va)\r\n"));
         return;
         }
     LogRaw(_L8("P2: ROM body 0x8011e138 khop ban goc\r\n"));
@@ -3749,6 +3897,15 @@ void E72OcEngine::RunAndLogL(TE72OcResult& aOut)
     // v8: KHONG Mem::FillZ(&aOut) nua (xoa iMaxLength cua TBuf<32> iFirmware ->
     // iFirmware.Copy() panic USER 23 = nguyen nhan crash that o v5/v6).
     aOut.Reset();
+    // v46: tu dong xoa file fixed-K cu de tranh 'keo' K=44 tu lan truoc; quet tu dong se chay that
+    {
+    RFs fs;
+    if (fs.Connect() == KErrNone)
+        {
+        fs.Delete(_L("C:\\data\\e72oc_fixed.txt"));
+        fs.Close();
+        }
+    }
     LogRaw(_L8("RunAndLogL: vao ham\r\n"));
 
     // v7: ghi 1 dong "con song" NGAY LAP TUC, truoc ca buoc kiem tra
