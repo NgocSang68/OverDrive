@@ -203,6 +203,7 @@ static TRgb LevelCol(TInt aK)
 // ---------- so lieu muc xung (PLL0 = 38.4 MHz * (140+K) / 9; goc 597 MHz) ----------
 static TInt MhzOf(TInt aK)
     {
+    if (aK == 30) return 744;  // E5-00: do thuc te
     return (TInt)(((TInt64)38400 * (140 + aK) / 9) / 1000);
     }
 
@@ -828,7 +829,7 @@ void CE72OcMainView::DrawClock(CWindowGc& aGc, const TRect& aR) const
         const TRect rg(row.iTl.iX + 11, row.iTl.iY + (rowH - rd) / 2, row.iTl.iX + 11 + rd, row.iTl.iY + (rowH - rd) / 2 + rd);
         Ring(aGc, rg, (k == gDefK) ? COL_ACCENT : COL_DIM, (k == gDefK));
         // hien 1 muc K=30 (744 MHz)
-        iTmpB.Format(_L("%d MHz"), 744);
+        iTmpB.Format(_L("%d MHz"), MhzOf(k));
         const TInt tx = rg.iBr.iX + 6;
         PutText(aGc, fn, TRect(tx, row.iTl.iY, row.iBr.iX, row.iBr.iY), iTmpB, COL_TEXT, CGraphicsContext::ELeft, 0);
         TPtrC tag = Tr(S_TG44 + (k - KMinK));
